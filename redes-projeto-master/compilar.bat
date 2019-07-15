@@ -1,0 +1,2 @@
+gcc -o executavel_servidor jogo_da_velha_redes_funcoes_genericas.c jogo_da_velha_redes_servidor.c
+gcc -o executavel_cliente jogo_da_velha_redes_funcoes_genericas.c jogo_da_velha_redes_cliente.c
