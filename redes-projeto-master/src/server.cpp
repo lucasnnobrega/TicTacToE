@@ -10,7 +10,7 @@
 int leJogada(int socket_sender, int *socket_jogadores, char tabuleiro[3][3], int turno, int contador_turnos)
 {
 
-    int verificador_de_erro, // variavel que vai ser usada para verificar se houve erro na função
+    int verificador_de_erro, // Variável que vai ser usada para verificar se houve erro na função
         linha,               // Variável que armazena o valor da linha
         coluna;              // Variável que armazena o valor da coluna
 
@@ -64,7 +64,8 @@ int leJogada(int socket_sender, int *socket_jogadores, char tabuleiro[3][3], int
         // Caso o resultado seja -1 há um erro de escrita
         if (verificador_de_erro < 0)
         {
-            perror("Houve um erro no reeenvio do dado de coluna para o cliente, o programa será encerrado.");
+            //perror("Houve um erro no reeenvio do dado de coluna para o cliente, o programa será encerrado.");
+            std::cerr << "Error in resend the column data for client. The program will be stopped. Error: " << strerror(errno) << std::endl;
             exit(1);
         }
     }
@@ -213,7 +214,8 @@ int main(int argc, char *argv[])
     // Caso o resultado seja -1 há um erro de leitura
     if (socket_servidor < 0)
     {
-        perror("Houve um erro ao criar o servidor.");
+        //perror("Houve um erro ao criar o servidor.");
+        std::cerr << "Error while create server. Error: " << strerror(errno) << std::endl;
         exit(1);
     }
     // Define o valor inicial para a porta como 1025
@@ -224,22 +226,29 @@ int main(int argc, char *argv[])
 
     // Define a estrutura do endereço do servidor.
     //
-    endereco_servidor.sin_family = AF_INET;         // endereço da vamília
+    endereco_servidor.sin_family = AF_INET;         // endereço da família
     endereco_servidor.sin_addr.s_addr = INADDR_ANY; // define que vai aceitar qualquer endereço da internet
 
     do
     {
-        endereco_servidor.sin_port = htons(porta); // define a porta usada pelo servidor
+        endereco_servidor.sin_port = htons(porta); // define the port used by the server
         // Não queremos selecionar a porta então usamos esse código para fazer o computador
         // procurar por uma porta livre para usar. A partir da 1025 não há proteção do sistema sobre
         // a porta
-        if (bind(socket_servidor, (struct sockaddr *)&endereco_servidor, sizeof(endereco_servidor)) < 0)
+        if (bind(socket_servidor, (struct sockaddr *)&endereco_servidor, sizeof(endereco_servidor)) < 0){
             porta++;
-        else
-            break; // sai ao achar uma porta.
+        }
+        else{
+            // sai ao achar uma porta
+            break; 
+        }
     } while (1);
+
     // É necessário saber o valor da porta do servidor por isso ela será printada.
-    printf("The port number is: %d\n", porta);
+    // printf("The port number is: %d\n", porta)
+
+    std::cout << "The port number is: " << porta << std::endl;
+
     // Põe o servidor para esperar por clientes, o numero inteiro indica quantos clientes podem conectar
     // listen(socket_servidor, 2);
 
@@ -251,7 +260,10 @@ int main(int argc, char *argv[])
     // Foi melhor usar endereco_servidor
     socklen_t tamanho_endereco = sizeof(endereco_servidor);
 
-    printf("Waiting players conections\n");
+    //printf("Waiting players conections\n");
+
+    std::cout << "Waiting players conections" << std::endl;
+
     while (clientes_conectados < 2)
     {
         listen(socket_servidor, 2);

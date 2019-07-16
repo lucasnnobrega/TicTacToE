@@ -12,9 +12,9 @@
 #define ERROR_COLUMN             "Error while reading the column, the program will be stopped."
 #define ERROR_GAME_STATE         "Error whlie reading the game state, the program will be stopped."
 #define ERROR_SEND_COLUMN_CLIENT "Error while sending data column to client, the program will be stopped."
-#define ERROR
-#define ERROR
-#define ERROR       
+//#define ERROR
+//#define ERROR
+//#define ERROR       
 
 
 

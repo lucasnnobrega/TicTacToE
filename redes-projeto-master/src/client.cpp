@@ -136,7 +136,8 @@ int main(int argc, char *argv[])
             fazJogada(socket_servidor, tabuleiro, eu_sou);
             printTabuleiro(tabuleiro);
 
-            printf("Waiting to the other player make a move\n");
+            //printf("Waiting to the other player make a move\n");
+            std::cout << "Waiting to the other player make a move\n" << std::endl;
             verifica_erro = read(socket_servidor, &estado_do_jogo, sizeof(estado_do_jogo));
             if (verifica_erro < 0)
             {

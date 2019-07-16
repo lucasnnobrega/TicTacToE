@@ -12,9 +12,12 @@
 #include <time.h>
 #include <sys/time.h>
 #include <errno.h>
-#include "constants.h"
 
+// CPP Libs
 #include <iostream>
+
+// Personal Libs
+#include "constants.h"
 
 
 #define PRIMEIRO_A_JOGAR 42
