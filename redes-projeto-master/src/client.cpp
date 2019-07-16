@@ -2,7 +2,7 @@
  * Neste arquivo serão contidas as funções relacionadas ao cliente
  *
 **/
-#include "../include/jogo_da_velha_redes_funcoes_genericas.h"
+#include "../include/generic_functions.h"
 /**
  *
 **/

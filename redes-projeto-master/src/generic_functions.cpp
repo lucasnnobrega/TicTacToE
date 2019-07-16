@@ -1,7 +1,7 @@
 /**
  * Aqui serão definidas as funções de uso coletivo do servidor e do cliente
 **/
-#include "../include/jogo_da_velha_redes_funcoes_genericas.h"
+#include "../include/generic_functions.h"
 /**
  *
 **/

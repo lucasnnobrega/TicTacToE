@@ -1,5 +1,5 @@
-#ifndef JOGO_DA_VELHA_REDES_FUNCOES_GENERICAS_H
-#define JOGO_DA_VELHA_REDES_FUNCOES_GENERICAS_H
+#ifndef GENERIC_FUNCTIONS_H
+#define GENERIC_FUNCTIONS_H
 
 #include <unistd.h>
 #include <netinet/in.h>
@@ -12,7 +12,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <errno.h>
-#include "jogo_da_velha_formatacao_print.h"
+#include "constants.h"
 
 #include <iostream>
 
@@ -30,4 +30,4 @@ extern int validaJogada(char tabuleiro[3][3], int linha, int coluna);
 extern void leInput(char tabuleiro[3][3], int jogada[2]);
 extern int verificaEstadoDoJogo(char tabuleiro[3][3], int contador_turnos, char tipo);
 
-#endif //JOGO_DA_VELHA_REDES_FUNCOES_GENERICAS_H
+#endif //GENERIC_FUNCTIONS_H
