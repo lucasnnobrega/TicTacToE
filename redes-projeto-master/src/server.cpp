@@ -26,7 +26,7 @@ int leJogada(int socket_sender, int *socket_jogadores, char tabuleiro[3][3], int
     // Caso o resultado seja -1 há um erro de leitura
     if (verificador_de_erro < 0)
     {
-        perror("Houve um erro na leitura do dado de linha, o programa será encerrado.");
+        //perror("Houve um erro na leitura do dado de linha, o programa será encerrado.");
         std::cerr << "Error reading the line data, the program will be stopped. Error: " << strerror(errno) << std::endl;
         exit(1);
     }
@@ -39,7 +39,8 @@ int leJogada(int socket_sender, int *socket_jogadores, char tabuleiro[3][3], int
     // Caso o resultado seja -1 há um erro de leitura
     if (verificador_de_erro < 0)
     {
-        perror("Houve um erro na leitura do dado de coluna, o programa será encerrado.");
+        //perror("Houve um erro na leitura do dado de coluna, o programa será encerrado.");
+        std::cerr << "Error read column data. The program will be stopped. Error: " << strerror(errno) << std::endl;
         exit(1);
     }
 
@@ -55,7 +56,8 @@ int leJogada(int socket_sender, int *socket_jogadores, char tabuleiro[3][3], int
         // Caso o resultado seja -1 há um erro de escrita
         if (verificador_de_erro < 0)
         {
-            perror("Houve um erro no reeenvio do dado de linha para o cliente, o programa será encerrado.");
+            //perror("Houve um erro no reeenvio do dado de linha para o cliente, o programa será encerrado.");
+            std::cerr << "Error in resend the line data for client. The program will be stopped. Error: " << strerror(errno) << std::endl;
             exit(1);
         }
         verificador_de_erro = write(socket_jogadores[1], &coluna, sizeof(coluna));
