@@ -2,7 +2,7 @@
  * Neste arquivo serão contidas as funções relacionadas ao servidor
  *
 **/
-#include "jogo_da_velha_redes_funcoes_genericas.h"
+#include "../include/jogo_da_velha_redes_funcoes_genericas.h"
 /**
  *
 **/
@@ -27,6 +27,7 @@ int leJogada(int socket_sender, int *socket_jogadores, char tabuleiro[3][3], int
     if (verificador_de_erro < 0)
     {
         perror("Houve um erro na leitura do dado de linha, o programa será encerrado.");
+        std::cerr << "Error reading the line data, the program will be stopped. Error: " << strerror(errno) << std::endl;
         exit(1);
     }
 
@@ -114,7 +115,8 @@ int leJogada(int socket_sender, int *socket_jogadores, char tabuleiro[3][3], int
         // Caso o resultado seja -1 há um erro de escrita
         if (verificador_de_erro < 0)
         {
-            perror("Houve um erro no reenvio do dado de coluna para o cliente, o programa será encerrado.");
+            //perror("Houve um erro no reenvio do dado de coluna para o cliente, o programa será encerrado.");
+            std::cerr << ERROR_SEND_COLUMN_CLIENT << "Error: " << strerror(errno) << std::endl;
             exit(1);
         }
         estadoDoJogo = temp;
@@ -123,7 +125,8 @@ int leJogada(int socket_sender, int *socket_jogadores, char tabuleiro[3][3], int
         // Caso o resultado seja -1 há um erro de escrita
         if (verificador_de_erro < 0)
         {
-            perror("Houve um erro no reeenvio do dado de coluna para o cliente, o programa será encerrado.");
+            //perror("Houve um erro no reeenvio do dado de coluna para o cliente, o programa será encerrado.");
+            std::cerr << ERROR_SEND_COLUMN_CLIENT << "Error: " << strerror(errno) << std::endl;
             exit(1);
         }
     }
@@ -179,9 +182,9 @@ int main(int argc, char *argv[])
     //Verifica argumentos
     if (argc != 2)
     {
-        fprintf(stderr, "Erro: número de argumentos inválido\n");
-        fprintf(stderr, "Tipo servidor recebe 2 argumentos da forma:\n");
-        fprintf(stderr, "./server porta\n");
+        fprintf(stderr, "Error: number of arguments invalid\n");
+        fprintf(stderr, "server program need 2 arguments e.g:\n");
+        fprintf(stderr, "./server port\n");
         exit(1);
     }
 
@@ -234,7 +237,7 @@ int main(int argc, char *argv[])
             break; // sai ao achar uma porta.
     } while (1);
     // É necessário saber o valor da porta do servidor por isso ela será printada.
-    printf("O número da porta utilizada é: %d\n", porta);
+    printf("The port number is: %d\n", porta);
     // Põe o servidor para esperar por clientes, o numero inteiro indica quantos clientes podem conectar
     // listen(socket_servidor, 2);
 
@@ -246,7 +249,7 @@ int main(int argc, char *argv[])
     // Foi melhor usar endereco_servidor
     socklen_t tamanho_endereco = sizeof(endereco_servidor);
 
-    printf("Esperando conexão de jogadores\n");
+    printf("Waiting players conections\n");
     while (clientes_conectados < 2)
     {
         listen(socket_servidor, 2);
@@ -266,7 +269,7 @@ int main(int argc, char *argv[])
             clientes_conectados++;
         }
 
-        printf("%sConectou %d\n%s", GREEN, clientes_conectados, RESET);
+        printf("%sConected %d\n%s", GREEN, clientes_conectados, RESET);
 
         if (clientes_conectados == 1)
         {
@@ -276,7 +279,8 @@ int main(int argc, char *argv[])
             // Caso o resultado seja -1 há um erro de escrita
             if (verificador_de_erro < 0)
             {
-                perror("Houve um erro no envio da info do primeiro a jogar, o programa será encerrado.");
+                //perror("Houve um erro no envio da info do primeiro a jogar, o programa será encerrado.");
+                std::cerr << "Error in sending the info of the first player, the program will be stopped. Error: " << strerror(errno) << std::endl;
                 exit(1);
             }
         }
@@ -288,7 +292,8 @@ int main(int argc, char *argv[])
             // Caso o resultado seja -1 há um erro de escrita
             if (verificador_de_erro < 0)
             {
-                perror("Houve um erro no envio da info do primeiro a jogar, o programa será encerrado.");
+                //perror("Houve um erro no envio da info do primeiro a jogar, o programa será encerrado.");
+                std::cerr << "Error in sending the info of the first player, the program will be stopped. Error: " << strerror(errno) << std::endl;
                 exit(1);
             }
         }

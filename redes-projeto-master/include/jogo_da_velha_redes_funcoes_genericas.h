@@ -14,6 +14,9 @@
 #include <errno.h>
 #include "jogo_da_velha_formatacao_print.h"
 
+#include <iostream>
+
+
 #define PRIMEIRO_A_JOGAR 42
 #define SEGUNDO_A_JOGAR 24
 #define EMPATE 55

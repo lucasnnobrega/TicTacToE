@@ -2,7 +2,7 @@
  * Neste arquivo serão contidas as funções relacionadas ao cliente
  *
 **/
-#include "jogo_da_velha_redes_funcoes_genericas.h"
+#include "../include/jogo_da_velha_redes_funcoes_genericas.h"
 /**
  *
 **/
@@ -30,14 +30,16 @@ int fazJogada(int socket_servidor, char tabuleiro[3][3], int eu_sou)
     // Caso o resultado seja -1 há um erro de escrita
     if (verificador_de_erro < 0)
     {
-        perror("Houve um erro no envio do dado de linha para o servidor, o programa será encerrado.");
+        //perror("Houve um erro no envio do dado de linha para o servidor, o programa será encerrado.");
+        std::cerr << "Error sending the line data for the server, program will be stopped. Error: " << strerror(errno) << std::endl; 
         exit(1);
     }
     verificador_de_erro = write(socket_servidor, &coluna, sizeof(coluna));
     // Caso o resultado seja -1 há um erro de escrita
     if (verificador_de_erro < 0)
     {
-        perror("Houve um erro no envio do dado de coluna para o servidor, o programa será encerrado.");
+        //perror("Houve um erro no envio do dado de coluna para o servidor, o programa será encerrado.");
+        std::cerr << "Error sending the line data for the server, program will be stopped. Error: " << strerror(errno) << std::endl;
         exit(1);
     }
     return 1;
@@ -48,8 +50,8 @@ int main(int argc, char *argv[])
     //Verifica argumentos
     if (argc != 3)
     {
-        fprintf(stderr, "Erro: número de argumentos inválido\n");
-        fprintf(stderr, "Tipo cliente recebe 3 argumentos da forma:\n");
+        fprintf(stderr, "Error: number of arguments invalid\n");
+        fprintf(stderr, "cliente need 3 arguments e.g:\n");
         fprintf(stderr, "./client ip porta \n");
         exit(1);
     }
@@ -74,11 +76,12 @@ int main(int argc, char *argv[])
     // Se não conseguir achar o host é um problema
     if (servidor == NULL)
     {
-        perror("Servidor não encontrado. O programa será encerrado");
+        //perror("Servidor não encontrado. O programa será encerrado");
+        std::cerr << "Error: " << strerror(errno) << std::endl; 
         exit(1);
     }
     // Tenta abrir conexão
-    printf("Servidor encontrado\n");
+    printf("Server found\n");
     socket_servidor = socket(AF_INET, SOCK_STREAM, 0);
 
     // adiciona timeout no socket
@@ -88,10 +91,11 @@ int main(int argc, char *argv[])
     // Se não conseguir abrir conexão é um problema
     if (socket_servidor < 0)
     {
-        perror("Houve um ao acessar o servidor. O programa será encerrado");
+        //perror("Houve um ao acessar o servidor. O programa será encerrado");
+        std::cerr << "Error in access the server. the program will be stopped. Error: " << strerror(errno) << std::endl; 
         exit(1);
     }
-    printf("Abriu socket\n");
+    printf("Open socket\n");
     // Limpa a estrutura de dados
     memset((struct sockaddr_in *)&endereco_servidor, 0, sizeof(endereco_servidor));
 
@@ -102,21 +106,23 @@ int main(int argc, char *argv[])
     bcopy((char *)servidor->h_addr, (char *)&endereco_servidor.sin_addr.s_addr, servidor->h_length);
     // Define a porta da conexão
     endereco_servidor.sin_port = htons(porta);
-    printf("Configurou estrutura\n");
+    printf("Estabilish struture\n");
     // Tenta conectar ao servidor, mas se não conseugir é um problema
     if (connect(socket_servidor, (const struct sockaddr *)&endereco_servidor, sizeof(endereco_servidor)) < 0)
     {
-        perror("Houve um ao se conectar o servidor. O programa será fechado");
+        //perror("Houve um ao se conectar o servidor. O programa será fechado");
+        std::cerr << "Error: " << strerror(errno) << std::endl; 
         exit(1);
     }
-    printf("Conectou com o servidor\n");
+    printf("Conected to server\n");
     // Assim que conectar ele vai receber uma mensagem dizendo de quem é a vez
     int estado = 0;
     verifica_erro = read(socket_servidor, &estado, sizeof(estado));
     // Caso o resultado seja -1 há um erro de leitura
     if (verifica_erro < 0)
     {
-        perror("Houve um erro na leitura do dado de estado, o programa será encerrado.");
+        //perror("Houve um erro na leitura do dado de estado, o programa será encerrado.");
+        std::cerr << "Error: " << strerror(errno) << std::endl; 
         exit(1);
     }
     estado = ntohs(estado);
@@ -130,23 +136,24 @@ int main(int argc, char *argv[])
             fazJogada(socket_servidor, tabuleiro, eu_sou);
             printTabuleiro(tabuleiro);
 
-            printf("Esperando o outro jogador fazer sua jogada\n");
+            printf("Waiting to the other player make a move\n");
             verifica_erro = read(socket_servidor, &estado_do_jogo, sizeof(estado_do_jogo));
             if (verifica_erro < 0)
             {
-                perror("Houve um erro na leitura do estado do jogo, o programa será encerrado.");
+                //perror("Houve um erro na leitura do estado do jogo, o programa será encerrado.");
+                std::cerr << "Error: " << strerror(errno) << std::endl; 
                 exit(1);
             }
             estado_do_jogo = ntohs(estado_do_jogo);
             if (estado_do_jogo == VITORIA)
             {
-                printf("\n%sVITÓRIA!!! :D %s\n\n", GREEN, RESET);
+                printf("\n%sVICTORY!!! :D %s\n\n", GREEN, RESET);
                 close(socket_servidor);
                 exit(0);
             }
             else if (estado_do_jogo == DERROTA)
             {
-                printf("\n%sDERROTA... :(%s\n\n", RED, RESET);
+                printf("\n%sDEFEAT... :(%s\n\n", RED, RESET);
                 close(socket_servidor);
                 exit(0);
             }
@@ -162,7 +169,8 @@ int main(int argc, char *argv[])
             // Caso o resultado seja -1 há um erro de leitura
             if (verifica_erro < 0)
             {
-                perror("Houve um erro na leitura do dado de linha, o programa será encerrado.");
+                //perror("Houve um erro na leitura do dado de linha, o programa será encerrado.");
+                std::cerr << ERROR_LINE  <<"Error: " << strerror(errno) << std::endl; 
                 exit(1);
             }
             verifica_erro = read(socket_servidor, &coluna, sizeof(coluna));
@@ -170,7 +178,8 @@ int main(int argc, char *argv[])
             // Caso o resultado seja -1 há um erro de leitura
             if (verifica_erro < 0)
             {
-                perror("Houve um erro na leitura do dado de coluna, o programa será encerrado.");
+                //perror("Houve um erro na leitura do dado de coluna, o programa será encerrado.");
+                std::cerr << ERROR_COLUMN << "Error whlie reading the column, the program will be stopped. Error: " << strerror(errno) <<std::endl; 
 
                 exit(1);
             }
@@ -180,28 +189,29 @@ int main(int argc, char *argv[])
             verifica_erro = read(socket_servidor, &estado_do_jogo, sizeof(estado_do_jogo));
             if (verifica_erro < 0)
             {
-                perror("Houve um erro na leitura do estado do jogo, o programa será encerrado.");
+                //perror("Houve um erro na leitura do estado do jogo, o programa será encerrado.");
+                std::cerr << "Error whlie reading the game state, the program will be stopped. Error: " << strerror(errno) << std::endl;  
                 exit(1);
             }
             estado_do_jogo = ntohs(estado_do_jogo);
             if (estado_do_jogo == VITORIA)
             {
                 printTabuleiro(tabuleiro);
-                printf("\n%sVITÓRIA!!! :D %s\n\n", GREEN, RESET);
+                printf("\n%sVICTORY!!! :D %s\n\n", GREEN, RESET);
                 close(socket_servidor);
                 exit(0);
             }
             else if (estado_do_jogo == DERROTA)
             {
                 printTabuleiro(tabuleiro);
-                printf("\n%sDERROTA... :(%s\n\n", RED, RESET);
+                printf("\n%sDEFEAT... :(%s\n\n", RED, RESET);
                 close(socket_servidor);
                 exit(0);
             }
             else if (estado_do_jogo == EMPATE)
             {
                 printTabuleiro(tabuleiro);
-                printf("%s\nEMPATE... :|%s\n\n", YELLOW, RESET);
+                printf("%s\nTIE... :|%s\n\n", YELLOW, RESET);
                 close(socket_servidor);
                 exit(0);
             }
@@ -212,13 +222,14 @@ int main(int argc, char *argv[])
         eu_sou = 'O';
         while (1)
         {
-            printf("Esperando o outro jogador fazer sua jogada\n");
+            printf("Waiting to the other player make a move\n");
             verifica_erro = read(socket_servidor, &linha, sizeof(linha));
 
             // Caso o resultado seja -1 há um erro de leitura
             if (verifica_erro < 0)
             {
-                perror("Houve um erro na leitura do dado de linha, o programa será encerrado.");
+                //perror("Houve um erro na leitura do dado de linha, o programa será encerrado.");
+                std::cerr << ERROR_LINE << "Error: " << strerror(errno) << std::endl;
                 exit(1);
             }
             verifica_erro = read(socket_servidor, &coluna, sizeof(coluna));
@@ -226,7 +237,9 @@ int main(int argc, char *argv[])
             // Caso o resultado seja -1 há um erro de leitura
             if (verifica_erro < 0)
             {
-                perror("Houve um erro na leitura do dado de coluna, o programa será encerrado.");
+                //perror("Houve um erro na leitura do dado de coluna, o programa será encerrado.");
+                //perror("Error whlie reading the line, the program will be stopped.");
+                std::cerr << ERROR_COLUMN << "Error: " << strerror(errno) << std::endl;
                 exit(1);
             }
 
@@ -237,21 +250,23 @@ int main(int argc, char *argv[])
             verifica_erro = read(socket_servidor, &estado_do_jogo, sizeof(estado_do_jogo));
             if (verifica_erro < 0)
             {
-                perror("Houve um erro na leitura do estado do jogo, o programa será encerrado.");
+                //perror("Houve um erro na leitura do estado do jogo, o programa será encerrado.");
+                //perror("Error whlie reading the game state, the program will be stopped.");
+                std::cerr << ERROR_GAME_STATE << "Error: " << strerror(errno) << std::endl;
                 exit(1);
             }
             estado_do_jogo = ntohs(estado_do_jogo);
             if (estado_do_jogo == VITORIA)
             {
                 printTabuleiro(tabuleiro);
-                printf("\n%sVITÓRIA!!! :D %s\n\n", GREEN, RESET);
+                printf("\n%sVICTORY!!! :D %s\n\n", GREEN, RESET);
                 close(socket_servidor);
                 exit(0);
             }
             else if (estado_do_jogo == DERROTA)
             {
                 printTabuleiro(tabuleiro);
-                printf("\n%sDERROTA... :(%s\n\n", RED, RESET);
+                printf("\n%sDEFEAT... :(%s\n\n", RED, RESET);
                 close(socket_servidor);
                 exit(0);
             }
@@ -269,25 +284,26 @@ int main(int argc, char *argv[])
             verifica_erro = read(socket_servidor, &estado_do_jogo, sizeof(estado_do_jogo));
             if (verifica_erro < 0)
             {
-                perror("Houve um erro na leitura do estado do jogo, o programa será encerrado.");
+                //perror("Houve um erro na leitura do estado do jogo, o programa será encerrado.");
+                std::cerr << "Error whlie reading the game state, the program will be stopped. Error: " << strerror(errno) << std::endl;
                 exit(1);
             }
             estado_do_jogo = ntohs(estado_do_jogo);
             if (estado_do_jogo == VITORIA)
             {
-                printf("\n%sVITÓRIA!!! :D %s\n\n", GREEN, RESET);
+                printf("\n%sVICTORY!!! :D %s\n\n", GREEN, RESET);
                 close(socket_servidor);
                 exit(0);
             }
             else if (estado_do_jogo == DERROTA)
             {
-                printf("\n%sDERROTA... :(%s\n\n", RED, RESET);
+                printf("\n%sDEFEAT... :(%s\n\n", RED, RESET);
                 close(socket_servidor);
                 exit(0);
             }
             else if (estado_do_jogo == EMPATE)
             {
-                printf("%s\nEMPATE... :|%s\n\n", YELLOW, RESET);
+                printf("%s\nTIE... :|%s\n\n", YELLOW, RESET);
                 close(socket_servidor);
                 exit(0);
             }

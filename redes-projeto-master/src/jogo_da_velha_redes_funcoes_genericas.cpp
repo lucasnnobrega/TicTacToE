@@ -1,7 +1,7 @@
 /**
  * Aqui serão definidas as funções de uso coletivo do servidor e do cliente
 **/
-#include "jogo_da_velha_redes_funcoes_genericas.h"
+#include "../include/jogo_da_velha_redes_funcoes_genericas.h"
 /**
  *
 **/
@@ -40,8 +40,7 @@ void printTabuleiro(char tabuleiro[3][3])
 
 int validaJogada(char tabuleiro[3][3], int linha, int coluna)
 {
-
-	if ((tabuleiro[linha - 1][coluna - 1] != '*') || ((linha < 1) || (linha > 4)) || ((coluna < 1) || (coluna > 4)))
+	if ((tabuleiro[linha - 1][coluna - 1] != '*') || (linha < 1) || (linha > 3) || (coluna < 1) || (coluna > 3))
 	{
 		return 0;
 	}
@@ -59,20 +58,20 @@ void leInput(char tabuleiro[3][3], int jogada[2])
 
 	printTabuleiro(tabuleiro);
 
-	printf("Sua vez de jogar\n\n");
+	printf("Your turn to play\n\n");
 
 	// Vai ficar tentando obter os dados corretos do usuário.
 	do
 	{
-		printf("Selecione a linha (1-3):  ");
+		printf("Select a line (1-3):  ");
 		scanf("%d", &linha);
-		printf("Selecione a coluna (1-3):  ");
+		printf("Select a column (1-3):  ");
 		scanf("%d", &coluna);
 
 		if (validaJogada(tabuleiro, linha, coluna))
 			break;
 		else
-			printf("\nO valor inserido não é uma posição válida. Tente novamente.\n\n");
+			printf("\n%sThe inserted value is not a valid position. Please try again.%s\n\n", RED, RESET);
 	} while (1);
 
 	jogada[0] = linha - 1;
