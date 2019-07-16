@@ -7,44 +7,44 @@
  *
 **/
 
-int leJogada(int socket_sender, int *socket_jogadores, char tabuleiro[3][3], int turno, int contador_turnos)
+int leMove(int socket_sender, int *socket_jogadores, char board[3][3], int turno, int turn_counter)
 {
 
     int verificador_de_erro, // Variável que vai ser usada para verificar se houve erro na função
-        linha,               // Variável que armazena o valor da linha
-        coluna;              // Variável que armazena o valor da coluna
+        row,               // Variável que armazena o valor da row
+        column;              // Variável que armazena o valor da column
 
     char tipo; // Vai ser 'X' ou 'O'
 
     int estadoDoJogo = 0; //Vai guardar o estado do jogo
 
-    // Aqui eu estou lendo, do socket_sender, o valor da linha.
-    // sizeof(linha) é usado para dizer o tamanho do dado sendo lido.
+    // Aqui eu estou lendo, do socket_sender, o valor da row.
+    // sizeof(row) é usado para dizer o tamanho do dado sendo lido.
     // Uma vez que este pode variar
-    verificador_de_erro = read(socket_sender, &linha, sizeof(linha));
+    verificador_de_erro = read(socket_sender, &row, sizeof(row));
 
     // Caso o resultado seja -1 há um erro de leitura
     if (verificador_de_erro < 0)
     {
-        //perror("Houve um erro na leitura do dado de linha, o programa será encerrado.");
-        std::cerr << "Error reading the line data, the program will be stopped. Error: " << strerror(errno) << std::endl;
+        //perror("Houve um erro na leitura do dado de row, o programa será encerrado.");
+        std::cerr << "Error reading the row data, the program will be stopped. Error: " << strerror(errno) << std::endl;
         exit(1);
     }
 
-    // Aqui eu estou lendo, do socket_sender, o valor da coluna.
-    // sizeof(coluna) é usado para dizer o tamanho do dado sendo lido.
+    // Aqui eu estou lendo, do socket_sender, o valor da column.
+    // sizeof(column) é usado para dizer o tamanho do dado sendo lido.
     // Uma vez que este pode variar
-    verificador_de_erro = read(socket_sender, &coluna, sizeof(coluna));
+    verificador_de_erro = read(socket_sender, &column, sizeof(column));
 
     // Caso o resultado seja -1 há um erro de leitura
     if (verificador_de_erro < 0)
     {
-        //perror("Houve um erro na leitura do dado de coluna, o programa será encerrado.");
+        //perror("Houve um erro na leitura do dado de column, o programa será encerrado.");
         std::cerr << "Error read column data. The program will be stopped. Error: " << strerror(errno) << std::endl;
         exit(1);
     }
 
-    // Como o servidor é central precisamos avisar ao outro jogador qual foi a jogada
+    // Como o servidor é central precisamos avisar ao outro jogador qual foi a move
     // Dessa forma, basicamente, vamos repassar essa mensagem para o outro jogador
     // Os dados ainda estão no formato de network nesse momento dessa forma basta
     // repassar eles
@@ -52,52 +52,54 @@ int leJogada(int socket_sender, int *socket_jogadores, char tabuleiro[3][3], int
     // O socket_sender indica qual o jogador que mandou a mensagem
     if (socket_sender == socket_jogadores[0])
     {
-        verificador_de_erro = write(socket_jogadores[1], &linha, sizeof(linha));
+        verificador_de_erro = write(socket_jogadores[1], &row, sizeof(row));
         // Caso o resultado seja -1 há um erro de escrita
         if (verificador_de_erro < 0)
         {
-            //perror("Houve um erro no reeenvio do dado de linha para o cliente, o programa será encerrado.");
-            std::cerr << "Error in resend the line data for client. The program will be stopped. Error: " << strerror(errno) << std::endl;
+            //perror("Houve um erro no reeenvio do dado de row para o cliente, o programa será encerrado.");
+            std::cerr << ERROR_RESEND_LIN_CLIENT <<"Error: " << strerror(errno) << std::endl;
             exit(1);
         }
-        verificador_de_erro = write(socket_jogadores[1], &coluna, sizeof(coluna));
+        verificador_de_erro = write(socket_jogadores[1], &column, sizeof(column));
         // Caso o resultado seja -1 há um erro de escrita
         if (verificador_de_erro < 0)
         {
-            //perror("Houve um erro no reeenvio do dado de coluna para o cliente, o programa será encerrado.");
-            std::cerr << "Error in resend the column data for client. The program will be stopped. Error: " << strerror(errno) << std::endl;
+            //perror("Houve um erro no reeenvio do dado de column para o cliente, o programa será encerrado.");
+            std::cerr << ERROR_RESEND_COL_CLIENT << "Error: " << strerror(errno) << std::endl;
             exit(1);
         }
     }
     else
     {
-        verificador_de_erro = write(socket_jogadores[0], &linha, sizeof(linha));
+        verificador_de_erro = write(socket_jogadores[0], &row, sizeof(row));
         // Caso o resultado seja -1 há um erro de escrita
         if (verificador_de_erro < 0)
         {
-            perror("Houve um erro no reeenvio do dado de linha para o cliente, o programa será encerrado.");
+            //perror("Houve um erro no reeenvio do dado de row para o cliente, o programa será encerrado.");
+            std::cerr << ERROR_RESEND_LIN_CLIENT << "Error: " << strerror(errno) << std::endl;
             exit(1);
         }
-        verificador_de_erro = write(socket_jogadores[0], &coluna, sizeof(coluna));
+        verificador_de_erro = write(socket_jogadores[0], &column, sizeof(column));
         // Caso o resultado seja -1 há um erro de escrita
         if (verificador_de_erro < 0)
         {
-            perror("Houve um erro no reeenvio do dado de coluna para o cliente, o programa será encerrado.");
+            //perror("Houve um erro no reeenvio do dado de column para o cliente, o programa será encerrado.");
+            std::cerr << ERROR_RESEND_COL_CLIENT << "Error: " << strerror(errno) << std::endl;
             exit(1);
         }
     }
     // O valor foi convertido para um formato de envio e dessa forma
     // necessita ser convertido de volta para um valor trabalhavel
-    linha = ntohs(linha);
-    coluna = ntohs(coluna);
+    row = ntohs(row);
+    column = ntohs(column);
 
     // Agora precisamoe saber se é o jogador "X" ou o jogador "O", para isto utilizamos
     // A variável turno, a qual é verdadeira para o jogador "X" e falta para o
     // jogador "O".
-    tabuleiro[linha][coluna] = turno ? 'O' : 'X';
+    board[row][column] = turno ? 'O' : 'X';
 
-    //Agora irá atualizar o tabuleiro
-    printTabuleiro(tabuleiro);
+    //Agora irá atualizar o board
+    printBoard(board);
 
     if (turno)
     {
@@ -108,9 +110,9 @@ int leJogada(int socket_sender, int *socket_jogadores, char tabuleiro[3][3], int
         tipo = 'X';
     }
 
-    //Depois que foi realizado a jogada, verifica se o cliente em questão ganhou o jogo (VITORIA), se ocorreu um empate (EMPATE) ou se não aconteceu nada e o jogo deve continuar (CONTINUA)
-    estadoDoJogo = verificaEstadoDoJogo(tabuleiro, contador_turnos, tipo);
-    if (estadoDoJogo == CONTINUA || estadoDoJogo == EMPATE)
+    //Depois que foi realizado a move, verifica se o cliente em questão ganhou o jogo (VICTORY), se ocorreu um empate (TIE) ou se não aconteceu nada e o jogo deve continuar (CONTINUE)
+    estadoDoJogo = verifyGameState(board, turn_counter, tipo);
+    if (estadoDoJogo == CONTINUE || estadoDoJogo == TIE)
     {
         int temp = estadoDoJogo;
         estadoDoJogo = htons(estadoDoJogo);
@@ -118,7 +120,7 @@ int leJogada(int socket_sender, int *socket_jogadores, char tabuleiro[3][3], int
         // Caso o resultado seja -1 há um erro de escrita
         if (verificador_de_erro < 0)
         {
-            //perror("Houve um erro no reenvio do dado de coluna para o cliente, o programa será encerrado.");
+            //perror("Houve um erro no reenvio do dado de column para o cliente, o programa será encerrado.");
             std::cerr << ERROR_SEND_COLUMN_CLIENT << "Error: " << strerror(errno) << std::endl;
             exit(1);
         }
@@ -128,12 +130,12 @@ int leJogada(int socket_sender, int *socket_jogadores, char tabuleiro[3][3], int
         // Caso o resultado seja -1 há um erro de escrita
         if (verificador_de_erro < 0)
         {
-            //perror("Houve um erro no reeenvio do dado de coluna para o cliente, o programa será encerrado.");
+            //perror("Houve um erro no reeenvio do dado de column para o cliente, o programa será encerrado.");
             std::cerr << ERROR_SEND_COLUMN_CLIENT << "Error: " << strerror(errno) << std::endl;
             exit(1);
         }
     }
-    else if (estadoDoJogo == VITORIA)
+    else if (estadoDoJogo == VICTORY)
     {
         if (socket_sender == socket_jogadores[0])
         {
@@ -142,16 +144,18 @@ int leJogada(int socket_sender, int *socket_jogadores, char tabuleiro[3][3], int
             // Caso o resultado seja -1 há um erro de escrita
             if (verificador_de_erro < 0)
             {
-                perror("Houve um erro no reeenvio do dado de coluna para o cliente, o programa será encerrado.");
+                //perror("Houve um erro no reeenvio do dado de column para o cliente, o programa será encerrado.");
+                std::cerr << ERROR_RESEND_COL_CLIENT << "Error: " << strerror(errno) << std::endl;
                 exit(1);
             }
-            estadoDoJogo = DERROTA;
+            estadoDoJogo = DEFEAT;
             estadoDoJogo = htons(estadoDoJogo);
             verificador_de_erro = write(socket_jogadores[1], &estadoDoJogo, sizeof(estadoDoJogo));
             // Caso o resultado seja -1 há um erro de escrita
             if (verificador_de_erro < 0)
             {
-                perror("Houve um erro no reeenvio do dado de coluna para o cliente, o programa será encerrado.");
+                //perror("Houve um erro no reeenvio do dado de column para o cliente, o programa será encerrado.");
+                std::cerr << ERROR_RESEND_COL_CLIENT << "Error: " << strerror(errno) << std::endl;
                 exit(1);
             }
         }
@@ -162,16 +166,18 @@ int leJogada(int socket_sender, int *socket_jogadores, char tabuleiro[3][3], int
             // Caso o resultado seja -1 há um erro de escrita
             if (verificador_de_erro < 0)
             {
-                perror("Houve um erro no reeenvio do dado de coluna para o cliente, o programa será encerrado.");
+                //perror("Houve um erro no reeenvio do dado de column para o cliente, o programa será encerrado.");
+                std::cerr << ERROR_RESEND_COL_CLIENT << "Error: " << strerror(errno) << std::endl;
                 exit(1);
             }
-            estadoDoJogo = DERROTA;
+            estadoDoJogo = DEFEAT;
             estadoDoJogo = htons(estadoDoJogo);
             verificador_de_erro = write(socket_jogadores[0], &estadoDoJogo, sizeof(estadoDoJogo));
             // Caso o resultado seja -1 há um erro de escrita
             if (verificador_de_erro < 0)
             {
-                perror("Houve um erro no reeenvio do dado de coluna para o cliente, o programa será encerrado.");
+                //perror("Houve um erro no reeenvio do dado de column para o cliente, o programa será encerrado.");
+                std::cerr << ERROR_RESEND_COL_CLIENT << "Error: " << strerror(errno) << std::endl;
                 exit(1);
             }
         }
@@ -194,10 +200,10 @@ int main(int argc, char *argv[])
     int socket_jogadores[2], // Armazena o socket do jogador 1 e 2
         socket_servidor,     // Armazena o socket do servidor
         turno,               // Define de quem é o turno
-        contador_turnos;     // Conta quantos turnos se passaram
+        turn_counter;     // Conta quantos turnos se passaram
 
-    char tabuleiro[3][3];                                      // array que controla o tabuleiro
-    contador_turnos = 0;                                       // Vai contar os turnos do jogador
+    char board[3][3];                                      // array que controla o board
+    turn_counter = 0;                                       // Vai contar os turnos do jogador
     turno = 0;                                                 // vai dizer quem é o primeiro a jogar
     int verificador_de_erro;                                   // verifica se operações deram erro
     setlocale(LC_ALL, "Portuguese");                           // Essa estrutura é definida pelo socket
@@ -208,7 +214,7 @@ int main(int argc, char *argv[])
     tv.tv_sec = 30;
     tv.tv_usec = 0;
 
-    iniciaTabuleiro(tabuleiro);
+    startBoard(board);
 
     socket_servidor = socket(AF_INET, SOCK_STREAM, 0);
     // Caso o resultado seja -1 há um erro de leitura
@@ -218,8 +224,8 @@ int main(int argc, char *argv[])
         std::cerr << "Error while create server. Error: " << strerror(errno) << std::endl;
         exit(1);
     }
-    // Define o valor inicial para a porta como 1025
-    int porta = atoi(argv[1]);
+    // Define o valor start para a port como 1025
+    int port = atoi(argv[1]);
 
     // Seta todos os bytes para 0
     memset((struct sockaddr_in *)&endereco_servidor, 0, sizeof(endereco_servidor));
@@ -231,24 +237,21 @@ int main(int argc, char *argv[])
 
     do
     {
-        endereco_servidor.sin_port = htons(porta); // define the port used by the server
-        // Não queremos selecionar a porta então usamos esse código para fazer o computador
-        // procurar por uma porta livre para usar. A partir da 1025 não há proteção do sistema sobre
-        // a porta
+        endereco_servidor.sin_port = htons(port); // define the port used by the server
+        // Não queremos selecionar a port então usamos esse código para fazer o computador
+        // procurar por uma port livre para usar. A partir da 1025 não há proteção do sistema sobre
+        // a port
         if (bind(socket_servidor, (struct sockaddr *)&endereco_servidor, sizeof(endereco_servidor)) < 0){
-            porta++;
+            port++;
         }
         else{
-            // sai ao achar uma porta
+            // sai ao achar uma port
             break; 
         }
     } while (1);
 
-    // É necessário saber o valor da porta do servidor por isso ela será printada.
-    // printf("The port number is: %d\n", porta)
-
-    std::cout << "The port number is: " << porta << std::endl;
-
+    // É necessário saber o valor da port do servidor por isso ela será printada.
+    printf("The port number is: %d\n", port);
     // Põe o servidor para esperar por clientes, o numero inteiro indica quantos clientes podem conectar
     // listen(socket_servidor, 2);
 
@@ -260,10 +263,7 @@ int main(int argc, char *argv[])
     // Foi melhor usar endereco_servidor
     socklen_t tamanho_endereco = sizeof(endereco_servidor);
 
-    //printf("Waiting players conections\n");
-
-    std::cout << "Waiting players conections" << std::endl;
-
+    printf("Waiting players conections\n");
     while (clientes_conectados < 2)
     {
         listen(socket_servidor, 2);
@@ -273,7 +273,8 @@ int main(int argc, char *argv[])
         socket_jogadores[clientes_conectados] = accept(socket_servidor, (struct sockaddr *)&endereco_cliente[clientes_conectados], &tamanho_endereco);
         if (socket_jogadores[clientes_conectados] < 0)
         {
-            perror("Houve um erro na conexão do cliente com o servidor.");
+            //perror("Houve um erro na conexão do cliente com o servidor.");
+            std::cerr << "Error in conection between client and server. Error: " << strerror(errno) << std::endl;
         }
         else
         {
@@ -287,9 +288,9 @@ int main(int argc, char *argv[])
 
         if (clientes_conectados == 1)
         {
-            int define_ordem = htons(PRIMEIRO_A_JOGAR); // variável temporária pq precisa ser um ponteiro no write
+            int define_ordem = htons(FIRST_TO_PLAY); // variável temporária pq precisa ser um ponteiro no write
             // Avisa ao primeiro a se conectar que ele é o primeiro a jogar
-            verificador_de_erro = write(socket_jogadores[clientes_conectados - 1], &define_ordem, sizeof(PRIMEIRO_A_JOGAR));
+            verificador_de_erro = write(socket_jogadores[clientes_conectados - 1], &define_ordem, sizeof(FIRST_TO_PLAY));
             // Caso o resultado seja -1 há um erro de escrita
             if (verificador_de_erro < 0)
             {
@@ -301,8 +302,8 @@ int main(int argc, char *argv[])
         else
         {
             // Avisa ao segundo a se conectar que ele é o segundo a jogar
-            int define_ordem = htons(SEGUNDO_A_JOGAR);
-            verificador_de_erro = write(socket_jogadores[clientes_conectados - 1], &define_ordem, sizeof(SEGUNDO_A_JOGAR));
+            int define_ordem = htons(SECOND_TO_PLAY);
+            verificador_de_erro = write(socket_jogadores[clientes_conectados - 1], &define_ordem, sizeof(SECOND_TO_PLAY));
             // Caso o resultado seja -1 há um erro de escrita
             if (verificador_de_erro < 0)
             {
@@ -314,13 +315,13 @@ int main(int argc, char *argv[])
     }
     // Não precisa mais ficar esperando jogadores
     close(socket_servidor);
-    contador_turnos = 0;
+    turn_counter = 0;
     // Servidor começa a ouvir as respostas e esperar
     while (1)
     {
-        contador_turnos++; // passa o turno
-        // Fica esperando jogada
-        leJogada(socket_jogadores[turno], socket_jogadores, tabuleiro, turno, contador_turnos);
+        turn_counter++; // passa o turno
+        // Fica esperando move
+        leMove(socket_jogadores[turno], socket_jogadores, board, turno, turn_counter);
         turno = !turno; // Passa o turno. O valor ocila entre 1 e 0.
     }
 }

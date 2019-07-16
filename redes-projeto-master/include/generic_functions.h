@@ -20,17 +20,17 @@
 #include "constants.h"
 
 
-#define PRIMEIRO_A_JOGAR 42
-#define SEGUNDO_A_JOGAR 24
-#define EMPATE 55
-#define VITORIA 81
-#define DERROTA 17
-#define CONTINUA 32 //Continua o jogo pois não aconteceu vitória nem empate
+#define FIRST_TO_PLAY 42
+#define SECOND_TO_PLAY 24
+#define TIE 55
+#define VICTORY 81
+#define DEFEAT 17
+#define CONTINUE 32 //Continua o jogo pois não aconteceu vitória nem empate
 
-extern void iniciaTabuleiro(char tabuleiro[3][3]);
-extern void printTabuleiro(char tabuleiro[3][3]);
-extern int validaJogada(char tabuleiro[3][3], int linha, int coluna);
-extern void leInput(char tabuleiro[3][3], int jogada[2]);
-extern int verificaEstadoDoJogo(char tabuleiro[3][3], int contador_turnos, char tipo);
+extern void startBoard(char board[3][3]);
+extern void printBoard(char board[3][3]);
+extern int validateMove(char board[3][3], int row, int column);
+extern void readInput(char board[3][3], int move[2]);
+extern int verifyGameState(char board[3][3], int turn_counter, char tipo);
 
 #endif //GENERIC_FUNCTIONS_H

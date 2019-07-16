@@ -6,7 +6,7 @@
  *
 **/
 
-void iniciaTabuleiro(char tabuleiro[3][3])
+void startBoard(char board[3][3])
 {
 
 	//Coloquei dessa forma e não em um for pq tava dando uns erros na hora da exibição dos caracteres
@@ -15,32 +15,32 @@ void iniciaTabuleiro(char tabuleiro[3][3])
 	{
 		for (int j = 0; j < 3; j++)
 		{
-			tabuleiro[i][j] = '*';
+			board[i][j] = '*';
 		}
 	}
-	// tabuleiro[1][1] = '*';
-	// tabuleiro[1][2] = '*';
-	// tabuleiro[1][3] = '*';
-	// tabuleiro[2][1] = '*';
-	// tabuleiro[2][2] = '*';
-	// tabuleiro[2][3] = '*';
-	// tabuleiro[3][1] = '*';
-	// tabuleiro[3][2] = '*';
-	// tabuleiro[3][3] = '*';
+	// board[1][1] = '*';
+	// board[1][2] = '*';
+	// board[1][3] = '*';
+	// board[2][1] = '*';
+	// board[2][2] = '*';
+	// board[2][3] = '*';
+	// board[3][1] = '*';
+	// board[3][2] = '*';
+	// board[3][3] = '*';
 }
 
-void printTabuleiro(char tabuleiro[3][3])
+void printBoard(char board[3][3])
 {
 
 	printf("\n   %d   %d   %d\n\n", 1, 2, 3);
-	printf("%d  %c   %c   %c\n\n", 1, tabuleiro[0][0], tabuleiro[0][1], tabuleiro[0][2]);
-	printf("%d  %c   %c   %c\n\n", 2, tabuleiro[1][0], tabuleiro[1][1], tabuleiro[1][2]);
-	printf("%d  %c   %c   %c\n\n", 3, tabuleiro[2][0], tabuleiro[2][1], tabuleiro[2][2]);
+	printf("%d  %c   %c   %c\n\n", 1, board[0][0], board[0][1], board[0][2]);
+	printf("%d  %c   %c   %c\n\n", 2, board[1][0], board[1][1], board[1][2]);
+	printf("%d  %c   %c   %c\n\n", 3, board[2][0], board[2][1], board[2][2]);
 }
 
-int validaJogada(char tabuleiro[3][3], int linha, int coluna)
+int validateMove(char board[3][3], int row, int column)
 {
-	if ((tabuleiro[linha - 1][coluna - 1] != '*') || (linha < 1) || (linha > 3) || (coluna < 1) || (coluna > 3))
+	if ((board[row - 1][column - 1] != '*') || (row < 1) || (row > 3) || (column < 1) || (column > 3))
 	{
 		return 0;
 	}
@@ -50,71 +50,71 @@ int validaJogada(char tabuleiro[3][3], int linha, int coluna)
 	}
 }
 
-void leInput(char tabuleiro[3][3], int jogada[2])
+void readInput(char board[3][3], int move[2])
 {
 
-	int linha = 0;
-	int coluna = 0;
+	int row = 0;
+	int column = 0;
 
-	printTabuleiro(tabuleiro);
+	printBoard(board);
 
 	printf("Your turn to play\n\n");
 
 	// Vai ficar tentando obter os dados corretos do usuário.
 	do
 	{
-		printf("Select a line (1-3):  ");
-		scanf("%d", &linha);
+		printf("Select a row (1-3):  ");
+		scanf("%d", &row);
 		printf("Select a column (1-3):  ");
-		scanf("%d", &coluna);
+		scanf("%d", &column);
 
-		if (validaJogada(tabuleiro, linha, coluna))
+		if (validateMove(board, row, column))
 			break;
 		else
 			printf("\n%sThe inserted value is not a valid position. Please try again.%s\n\n", RED, RESET);
 	} while (1);
 
-	jogada[0] = linha - 1;
-	jogada[1] = coluna - 1;
+	move[0] = row - 1;
+	move[1] = column - 1;
 }
 
-int verificaEstadoDoJogo(char tabuleiro[3][3], int contador_turnos, char tipo)
+int verifyGameState(char board[3][3], int turn_counter, char tipo)
 {
-	//Verifica as linhas
+	//Verifica as rows
 	for (int i = 0; i < 3; i++)
 	{
-		if (tabuleiro[i][0] == tipo && tabuleiro[i][0] == tabuleiro[i][1] && tabuleiro[i][0] == tabuleiro[i][2])
+		if (board[i][0] == tipo && board[i][0] == board[i][1] && board[i][0] == board[i][2])
 		{
-			return VITORIA;
+			return VICTORY;
 		}
 	}
 
-	//Verifica as colunas
+	//Verifica as columns
 	for (int j = 0; j < 3; j++)
 	{
-		if (tabuleiro[0][j] == tipo && tabuleiro[0][j] == tabuleiro[1][j] && tabuleiro[0][j] == tabuleiro[2][j])
+		if (board[0][j] == tipo && board[0][j] == board[1][j] && board[0][j] == board[2][j])
 		{
-			return VITORIA;
+			return VICTORY;
 		}
 	}
 
 	//Verifica a diagonal principal
-	if (tabuleiro[0][0] == tabuleiro[1][1] && tabuleiro[0][0] == tabuleiro[2][2] && tabuleiro[0][0] == tipo)
+	if (board[0][0] == board[1][1] && board[0][0] == board[2][2] && board[0][0] == tipo)
 	{
-		return VITORIA;
+		return VICTORY;
 	}
 
 	//Verifica a diagonal secundária
-	if (tabuleiro[0][2] == tabuleiro[1][1] && tabuleiro[0][2] == tabuleiro[2][0] && tabuleiro[0][2] == tipo)
+	if (board[0][2] == board[1][1] && board[0][2] == board[2][0] && board[0][2] == tipo)
 	{
-		return VITORIA;
+		return VICTORY;
 	}
 
 	//Retorna empate se estiver no nono turno e não tiver acontecido uma vitória
-	if (contador_turnos == 9)
+	if (turn_counter == 9)
 	{
-		return EMPATE;
+		return TIE;
 	}
 
-	return CONTINUA;
+	return CONTINUE;
 }
